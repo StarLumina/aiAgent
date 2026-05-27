@@ -1,7 +1,0 @@
-import os
-
-def write_file(working_directory, file_path, content):
-    try:
-
-    except Exception as e:
-        return f'Error: Something went amiss, {e}'

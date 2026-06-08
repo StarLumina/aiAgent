@@ -5,6 +5,7 @@ from google import genai
 from google.genai import types
 from prompts import system_prompt
 from call_function import available_functions, call_function
+from google.genai import types
 
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
@@ -43,7 +44,7 @@ def main():
             if function_call_result.parts[0].function_response == None: raise Exception("Error: missing response")
             if function_call_result.parts[0].function_response.response == None: raise Exception("Error: missing response field from response")
             list_of_results.append(function_call_result.parts[0])
-            if verbose: print(f"-> {function_call_result.parts[0].function_response.response}")
+            if args.verbose: print(f"-> {function_call_result.parts[0].function_response.response["result"]}")
 
 
     if args.verbose:

@@ -5,6 +5,7 @@ from functions.run_python_file import schema_run_python_file, run_python_file
 from functions.write_file import schema_write_file,write_file
 from collections.abc import Callable
 
+
 available_functions = types.Tool(
     function_declarations=[
         schema_get_files_info, 
@@ -23,7 +24,7 @@ def call_function(function_call: types.FunctionCall, verbose: bool = False) -> t
 
     function_map = {
     "get_file_content": get_file_content,
-    "get_file_info": get_files_info,
+    "get_files_info": get_files_info,
     "write_file": write_file,
     "run_python_file": run_python_file,
     }
@@ -44,8 +45,6 @@ def call_function(function_call: types.FunctionCall, verbose: bool = False) -> t
     args["working_directory"] = "./calculator"
 
     function_result = function_map[function_name](**args)
-
-    from google.genai import types
 
     return types.Content(
         role="tool",

@@ -1,5 +1,6 @@
 import os
 import argparse
+import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -27,25 +28,41 @@ def main():
     ]
     list_of_results=[]
 
-    response = client.models.generate_content(
-        model = 'gemini-2.5-flash', 
-        contents = messages,
-        config = types.GenerateContentConfig(
-            tools=[available_functions], system_instruction=system_prompt
-            )
-        )
-    if response.usage_metadata is None:
-        raise RuntimeError("NO METADATA")
-    
-    if response.function_calls:
-        for function_call in response.function_calls:
-            function_call_result = call_function(function_call, args.verbose)
-            if not function_call_result.parts: raise Exception("Error: missing parts field from function call result")
-            if function_call_result.parts[0].function_response == None: raise Exception("Error: missing response")
-            if function_call_result.parts[0].function_response.response == None: raise Exception("Error: missing response field from response")
-            list_of_results.append(function_call_result.parts[0])
-            if args.verbose: print(f"-> {function_call_result.parts[0].function_response.response["result"]}")
+    for _ in range(20):
+        list_of_results =[]
 
+        response = client.models.generate_content(
+            model = 'gemini-2.5-flash', 
+            contents = messages,
+            config = types.GenerateContentConfig(
+                tools=[available_functions], system_instruction=system_prompt
+                )
+            )
+        
+
+        if response.candidates:
+            for candidate in response.candidates:
+                messages.append(candidate.content)
+
+
+        if response.usage_metadata is None:
+            raise RuntimeError("NO METADATA")
+
+        if response.function_calls:
+            for function_call in response.function_calls:
+                function_call_result = call_function(function_call, args.verbose)
+                if not function_call_result.parts: raise Exception("Error: missing parts field from function call result")
+                if function_call_result.parts[0].function_response == None: raise Exception("Error: missing response")
+                if function_call_result.parts[0].function_response.response == None: raise Exception("Error: missing response field from response")
+                list_of_results.append(function_call_result.parts[0])
+                if args.verbose: print(f"-> {function_call_result.parts[0].function_response.response["result"]}")
+        else:
+            break     
+        
+        messages.append(types.Content(role="user", parts= list_of_results))
+    else: 
+        print("Maximum number of iterations reached")
+        sys.exit(1)
 
     if args.verbose:
         print(f"User prompt: {args.user_prompt}")
@@ -54,6 +71,8 @@ def main():
         print(response.text)
     else:
         print(f"\n{response.text}")
+
+
 
 
 

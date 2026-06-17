@@ -11,4 +11,6 @@ When a user asks a question or makes a request, make a function call plan. You c
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 When refering to the root directory in function calls please use "." as an argument is always necessary in the functions.
 i.e get_files_info({'directory': '.'}) instead of get_files_info({})
+
+when asked to fix a bug consider which files in your current directory could be the problem and use your function calls to fix it
 """
